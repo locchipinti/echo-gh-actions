@@ -37,15 +37,3 @@ jobs:
           context: .
           push: true
           tags: locchipinti/tesis:$APP_TYPE-$SHA_COMMIT
-
-      # - name: Build, tag, and push image to Amazon ECR
-      #   id: build-image
-      #   env:
-      #     ECR_REGISTRY: ${{ secrets.AWS_REGISTRY }}
-      #     ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-      #     APPLICATION_TYPE: ${{ github.event.inputs.application_type }}
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG .
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG"
