@@ -1,0 +1,51 @@
+name: Publish to Docker image
+
+permissions: write-all
+on:
+  workflow_call:
+    inputs:
+      application_type:
+        description: 'The type of application to deploy. Accepted values: frontend, backend, api'
+        type: choice
+        options:
+          - frontend
+          - backend
+          - api
+        required: true
+
+env:
+  APP_TYPE: ${{ inputs.application_type }}
+  SHA_COMMIT: ${{ github.sha }}
+
+
+jobs:
+  deploy-to-docker-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: Build and Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: locchipinti/tesis:$APP_TYPE-$SHA_COMMIT
+
+      # - name: Build, tag, and push image to Amazon ECR
+      #   id: build-image
+      #   env:
+      #     ECR_REGISTRY: ${{ secrets.AWS_REGISTRY }}
+      #     ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      #     APPLICATION_TYPE: ${{ github.event.inputs.application_type }}
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG .
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG
+      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$APPLICATION_TYPE-$IMAGE_TAG"
